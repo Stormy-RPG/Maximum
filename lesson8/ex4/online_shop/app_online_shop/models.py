@@ -1,4 +1,7 @@
 from django.db import models
+from django.utils.html import format_html
+from django.utils import timezone
+from django.contrib import admin
 
 # Create your models here.
 
@@ -24,6 +27,24 @@ class OnlineShop(models.Model):
     # создаём дату обновления объявления
     # auto_now=True - получаем дату в момент обновления объявления
     update_time = models.DateTimeField(auto_now=True)
+
+    @admin.display(description='Дата создания')
+    def created_date(self):
+        if self.created_time.date() == timezone.now().date():
+            created_time = self.created_time.time().strftime("%H:%M:%S")
+            return format_html(
+                '<span style="color: green; font-weight: bold;">Сегодня в {}</span>', created_time
+            )
+        return self.created_time.strftime("%d.%m.%Y в %H:%M:%S")
+
+    @admin.display(description='Дата последнего обновления')
+    def updated_date(self):
+        if self.update_time.date() == timezone.now().date():
+            created_time = self.update_time.time().strftime("%H:%M:%S")
+            return format_html(
+                '<span style="color: green; font-weight: bold;">Сегодня в {}</span>', created_time
+            )
+        return self.update_time.strftime("%d.%m.%Y в %H:%M:%S")
 
     class Meta:
         db_table = 'advertisements'
